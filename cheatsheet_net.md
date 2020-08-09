@@ -148,7 +148,7 @@
 
 `lsof –n –i4TCP –i4UDP`
  
-<h2 id="cracking-online">Cracking Online</h2
+<h2 id="cracking-online">Cracking Online</h2>
  
 <h3 id="cracking-auth">Cracking de autenticación</h3>
  
