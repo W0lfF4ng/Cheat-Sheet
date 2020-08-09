@@ -1,14 +1,35 @@
 # Reconnaissance Cheat Sheet
 
-## Mapeo de red
+- [Mapeo de red](#mapeo-red)
+  - [Ping](#ping)
+    - [Opciones Linux](#ping-2)
+    - [Opciones Windows](#ping-3)
+  - [FPing](#fping)
+    - [Ejemplo especificando CIDR y rango de hosts](#fping-2)
+    - [Ejemplo eliminando los mensajes ICMP Host Unreachable](#fping-3)
+  - [Nmap](#nmap)
+    - [Opciones de escaneo básico](#nmap-2)
+    - [Opciones de descubrimiento](#nmap-3)
+    - [Opciones de escaneo avanzado](#nmap-4)
+    - [Opciones de escaneo de puertos](#nmap-5)
+    - [Detección de servicios y sistema operativo](#nmap-6)
+    - [Opciones de tiempo](#nmap-7)
+    - [Evasión de Firewalls](#nmap-8)
+    - [Opciones de output](#nmap-9)
+    - [Ejemplo de escaneo usando nmap](#nmap-10)
+    - [Ejemplo de escaneo de vulnerabilidades usando nmap](#nmap-11)
+  - [Masscan](#masscan)
+    - [Ejemplo de escaneo usando masscan](#masscan-2)
 
-### Ping
+<h2 id="mapeo-red">Mapeo de red</h2>
+
+<h3 id="ping">Ping</h3>
 
 Herramienta que permite enviar mensajes icmp echo request a un destino.
 
 `ping [option] [target]`
 
-Opciones Linux:
+<h4 id="ping-2">Opciones Linux</h4>
 
 ```
 -c [count]: Cantidad de paquetes a enviar
@@ -17,7 +38,7 @@ Opciones Linux:
 -v: Verbose
 ```
 
-Opciones Windows:
+<h4 id="ping-3">Opciones Windows</h4>
 
 ```
 -t: Ping continuo
@@ -25,7 +46,7 @@ Opciones Windows:
 -n [count]: Cantidad de paquetes a enviar
 ```
 
-### FPing
+<h3 id="fping"> FPing</h3>
 
 Herramienta de ping sweeping.
 
@@ -36,25 +57,25 @@ Herramienta de ping sweeping.
 -g: Realiza un ping sweep
 ```
 
-#### Ejemplo especificando CIDR y rango de hosts
+<h4 id="fping-2">Ejemplo especificando CIDR y rango de hosts</h4>
 
 `fping -a -g 192.168.1.0/24`
 
 `fping -a -g 192.168.1.8 192.168.1.45`
 
-#### Ejemplo eliminando los mensajes ICMP Host Unreachable
+<h4 id="fping-3">Ejemplo eliminando los mensajes ICMP Host Unreachable</h4>
 
 > El 2 equivale a los stderr (standard error).
 
 `fping -a -g 192.168.1.0/24 2>/dev/null`
 
-### Nmap
+<h3 id="nmap">Nmap</h3>
 
 Herramienta de network mapping, permite enumerar dispositivos, servicios, OS, versiones, etc.
 
 `nmap [scan type(s)] [options] [target]`
 
-#### Opciones de escaneo básico
+<h4 id="nmap-2">Opciones de escaneo básico</h4>
 
 ```
 nmap [target]: Escaneo de los 1000 puertos más comunes
@@ -66,7 +87,7 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 -6: Escaneo a direcciones IPv6
 ```
 
-#### Opciones de descubrimiento
+<h4 id="nmap-3">Opciones de descubrimiento</h4>
 
 ```
 -PS[port_list]: Descubrimiento mediante TCP SYN
@@ -88,7 +109,7 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 -sL: DNS reverso a lista de escaneo
 ```
 
-#### Opciones de escaneo avanzado
+<h4 id="nmap-4">Opciones de escaneo avanzado</h4>
 
 ```
 -sS: Escaneo mediante TCP SYN
@@ -104,7 +125,7 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 
 > [IP protocol](http://iana.org/assignments/protocol-numbers)
 
-#### Opciones de escaneo de puertos
+<h4 id="nmap-5">Opciones de escaneo de puertos</h4>
 
 ```
 -F: Escanea el top 100 de puertos más comunes
@@ -116,7 +137,7 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 --open: Solo muestra los puertos abiertos, removiendo los cerrados y filtrados
 ```
 
-#### Detección de servicios y sistema operativo
+<h4 id="nmap-6">Detección de servicios y sistema operativo</h4>
 
 ```
 -O: Detección del OS/Fingerprint
@@ -128,13 +149,13 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 
 > [Fingerprint](http://nmap.org/submit/)
 
-#### Opciones de tiempo
+<h4 id="nmap-7">Opciones de tiempo</h4>
 
 ```
 -T[0-5]: Velocidad de escaneo, 0 es el más lento, 5 el más rápido
 ```
 
-#### Evasión de Firewalls
+<h4 id="nmap-8">Evasión de Firewalls</h4>
 
 ```
 -f: Envío de paquetes fragmentados (paquetes de 8-B)
@@ -144,7 +165,7 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 --source-port [port]: Especifica el puerto de origen del escaneo
 ```
 
-#### Opciones de output
+<h4 id="nmap-9">Opciones de output</h4>
 
 ```
 -oN [file.txt]: Guarda el output en un archivo de texto
@@ -154,15 +175,15 @@ nmap [target]: Escaneo de los 1000 puertos más comunes
 -oS [file.txt]: Guarda el output en un archivo de texto con lenguaje “juvenil” (para script kiddies)
 ```
 
-#### Ejemplo de escaneo usando nmap
+<h4 id="nmap-10">Ejemplo de escaneo usando nmap</h4>
 
 `nmap -Pn -sS -sV -sC -p- 192.168.1-50.1-254 -oA nmapTarget`
 
-#### Ejemplo de escaneo de vulnerabilidades usando nmap
+<h4 id="nmap-11">Ejemplo de escaneo de vulnerabilidades usando nmap</h4>
 
 `nmap -Pn -n --script vuln 192.168.1.32 -oN vulns.txt`
 
-### [Masscan](https://github.com/robertdavidgraham/masscan)
+<h3 id="masscan"><a href="https://github.com/robertdavidgraham/masscan">Masscan</a><h3>
 
 Herrmaienta para realizar escaneos masivos.
 
@@ -179,6 +200,6 @@ Herrmaienta para realizar escaneos masivos.
 --router-ip [ip_address]: Permite indicar desde que IP realizar el escaneo
 ```
 
-#### Ejemplo de escaneo usando masscan
+<h4 id="masscan-2">Ejemplo de escaneo usando masscan</h4>
 
 `masscan -p0-65535 -sS 192.168.1.1 –rate=10000 –e tun0 > masscanTarget.txt`
