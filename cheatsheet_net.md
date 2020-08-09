@@ -21,7 +21,7 @@
     - [Linux](#session-linux)
     - [macOS](#session-macos)
 - [Cracking Online](#cracking-online)
-  - [Cracking de autenticación](#crack-auth)
+  - [Cracking de autenticación](#cracking-auth)
   - [Hydra](#hydra)
     - [Ejemplo de obtención de detalle de módulo RDP](#hydra-2)
     - [Ejemplo cracking telnet con ataque de diccionario](#hydra-3)
@@ -150,7 +150,7 @@
  
 <h2 id="cracking-online">Cracking Online</h2
  
-<h3 id="crack-auth">Cracking de autenticación</h3>
+<h3 id="cracking-auth">Cracking de autenticación</h3>
  
 Es posible crackear la autenticación de varios protocolos de red como, por ejemplo:
 
