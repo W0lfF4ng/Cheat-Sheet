@@ -105,7 +105,7 @@
 
 `arp`
 
-<h4 id="t-arp-lunix">Linux</h4>
+<h4 id="t-arp-linux">Linux</h4>
 
 `ip neighbour`
 
