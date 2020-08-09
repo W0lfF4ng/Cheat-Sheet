@@ -1,6 +1,16 @@
 # Vulnerability Assessment Cheat Sheet
 
-## Ciclo de vida de un análisis de vulnerabilidades
+- [Ciclo de vida de un análisis de vulnerabilidades](#ciclo-avu)
+  - [Nessus](#nessus)
+    - [Comandos en Kali](#nessus-comandos)
+    - [Iniciar/Detener Nessus](#nessus-2)
+    - [Realiza una actualización, según lo indicado por GUI](#nessus-3)
+    - [Fuerza a una actualización de todos los componentes de Nessus](#nessus-4)
+    - [Fuerza a la actualización de solo los plugins](#nessus-5)
+    - [Realiza un de los plugins a través de un archivo tar](#nessus-6)
+    - [Ejemplo de escaneo de vulnerabilidades](#nessus-7)
+
+<h2 id="ciclo-avu">Ciclo de vida de un análisis de vulnerabilidades</h2>
 
 Una evaluación de vulnerabilidad es un análisis de las vulnerabilidades encontradas en redes y aplicaciones. En un AVU (análisis de vulnerabilidades) no se confirma mediante explotación una vulnerabilidad, además, corresponde a un proceso lineal:
 
@@ -26,7 +36,7 @@ Es necesario tener en cuenta que, para aplicaciones customizadas, puede que un e
 -	Entender como ingresa a recursos como: bases de datos, servidores, archivos locales/remotos, etc.
 -	Aplicar ingeniería inversa
 
-### Nessus
+<h3 id="nessus">Nessus</h3>
 
 Para utilizar Nessus, se deben seguir los siguientes pasos:
 
@@ -35,37 +45,36 @@ Para utilizar Nessus, se deben seguir los siguientes pasos:
 3. Por cada servicio detectado, se realiza una query a la base de datos para determinar si tiene alguna vulnerabilidad conocida (se puede especificar que vulnerabilidades buscar).
 4. Pruebas, en este paso, el escáner envía probes para verificar la existencia de la vulnerabilidad (pueden existir falsos positivos).
 
-#### [Comandos](https://docs.tenable.com/nessus/Content/CommandLineOperations.htm) en Kali
+<h4 id="nessus-comandos"><a href="https://docs.tenable.com/nessus/Content/CommandLineOperations.htm">Comandos en Kali</a></h4>
 
 `/etc/init.d/nessusd [option]`
 
 `/opt/nessus/sbin/nessuscli [args]`
 
-- Iniciar Nessus:
+<h4 id="nessus-2">Iniciar/Detener Nessus</h4>
 
-`/etc/init.d/nessusd start`
+```
+/etc/init.d/nessusd start
+/etc/init.d/nessusd stop
+```
 
-- Detener Nessus:
-
-`/etc/init.d/nessusd stop`
-
-- Realiza una actualización, según lo indicado por GUI:
+<h4 id="nessus-3">Realiza una actualización, según lo indicado por GUI</h4>
 
 `/opt/nessus/sbin/nessuscli update`
 
-- Fuerza a una actualización de todos los componentes de Nessus:
+<h4 id="nessus-4">Fuerza a una actualización de todos los componentes de Nessus</h4>
 
 `/opt/nessus/sbin/nessuscli update --all`
 
-- Fuerza a la actualización de solo los plugins:
+<h4 id="nessus-5">Fuerza a la actualización de solo los plugins</h4>
 
 `/opt/nessus/sbin/nessuscli update –plugins-only`
 
-- Realiza un [update](https://docs.tenable.com/nessus/Content/ManageNessusOffline.htm) de los plugins a través de un archivo [tar](https://docs.tenable.com/nessus/Content/DownloadAndCopyPlugins.htm):
+<h4 id="nessus-6">Realiza un <a href="https://docs.tenable.com/nessus/Content/ManageNessusOffline.htm">update</a> de los plugins a través de un archivo <a href="https://docs.tenable.com/nessus/Content/DownloadAndCopyPlugins.htm">tar</a></h4>
 
 `/opt/nessus/sbin/nessuscli update file.tar.gz`
 
-#### Ejemplo de escaneo de vulnerabilidades
+<h4 id="nessus-7">Ejemplo de escaneo de vulnerabilidades</h4>
 
 1. Ejecutar Nessus. Comando: `/etc/init.d/nessusd start`
 2. Actualizar Nessus. Comando: `/opt/nessus/sbin/nessuscli –-all`
