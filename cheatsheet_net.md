@@ -119,7 +119,7 @@
 
 `ip route add deafult via 192.168.1.1 dev eth0`
 
-<h4>static-route-windows">Windows</h4>
+<h4 id="static-route-windows">Windows</h4>
 
 `route add [network] mask [mask] [gw]`
 
