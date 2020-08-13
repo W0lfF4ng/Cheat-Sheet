@@ -25,6 +25,17 @@
       - [Haciendo uso de la codificación HTML](#contextos-haciendo-uso-codificación-html)
       - [XSS en templates literales de JavaScript](#contextos-xss-templates-literales-javascript)
     - [XSS en el contexto del sandbox de AngularJS](#xss-contexto-sandbox-angularjs)
+- [Mitigación](#mitigacion)
+  - [Codificar datos en la salida](#codificar-datos-salida)
+  - [Validar la entrada a la llegada](#validar-entrada-llegada)
+    - [Whitelisting vs blacklisting](#whitelisting-blacklisting)
+  - [Permitir HTML "seguro"](#permitir-html-seguro)
+  - [Cómo prevenir XSS usando un motor de plantilla](#prevenir-xss-motor-plantilla)
+  - [Cómo prevenir XSS en PHP](#prevenir-xss-php)
+  - [Cómo prevenir XSS del lado del cliente en JavaScript](#prevenir-xss-client-side-js)
+  - [Cómo prevenir XSS en PHP](#prevenir-xss-php)
+  - [Cómo prevenir XSS usando Content Security Policy (CSP)](#prevenir-xss-csp)
+    - [Content Security Policy](#content-security-policy)
 
 <h2 id="que-xss">¿Qué es un Cross-Site Scripting?</h2>
 
@@ -364,3 +375,62 @@ ${alert(document.domain)}
 <h4 id="xss-contexto-sandbox-angularjs">XSS en el contexto del sandbox de AngularJS</h4>
 
 A veces, las vulnerabilidades XSS surgen en el contexto de AngularJS sandbox. Esto presenta barreras adicionales para la explotación, que a menudo se pueden sortear con suficiente ingenio.
+
+FALTA!!!
+
+<h2 id="mitigacion">Mitigación</h2>
+
+La mitigación de los XSS generalmente se puede lograr mediante dos capas de defensa:
+
+- Codificar datos en la salida
+- Validar la entrada a la llegada
+
+<h3 id="codificar-datos-salida">Codificar datos en la salida</h3>
+
+La codificación debe aplicarse directamente antes de que los datos controlables por el usuario se escriban en una página, porque el contexto en el que está escribiendo determina qué tipo de codificación necesita usar. Por ejemplo, los valores dentro de un string JavaScript requieren un tipo de escape diferente a los de un contexto HTML.
+
+En un contexto HTML, debe convertir los valores no incluidos en la lista blanca en entidades HTML:
+
+- `<` se convierte en `&lt;`
+- `>` se convierte en `&gt;`
+
+En un contexto de string JavaScript, los valores no alfanuméricos deben tener un escape Unicode:
+
+- `<` se convierte en `\u003c`
+- `>` se convierte en `\u003e`
+
+<h3 id="validar-entrada-llegada">Validar la entrada a la llegada</h3>
+
+asd
+
+<h4 id="whitelisting-blacklisting">Whitelisting vs blacklisting</h4>
+
+asd
+
+<h3 id="permitir-html-seguro">Permitir HTML "seguro"</h3>
+
+asd
+
+<h3 id="prevenir-xss-motor-plantilla">Cómo prevenir XSS usando un motor de plantilla</h3>
+
+asd
+
+<h3 id="prevenir-xss-php">Cómo prevenir XSS en PHP</h3>
+
+asd
+
+<h3 id="prevenir-xss-client-side-js">Cómo prevenir XSS del lado del cliente en JavaScript</h3>
+
+asd
+
+<h3 id="prevenir-xss-php">Cómo prevenir XSS en PHP</h3>
+
+asd
+
+<h3 id="prevenir-xss-csp">Cómo prevenir XSS usando Content Security Policy (CSP)</h3>
+
+asd
+
+<h4 id="content-security-policy">Content Security Policy</h4>
+
+asd
