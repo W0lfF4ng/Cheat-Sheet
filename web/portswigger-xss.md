@@ -17,6 +17,14 @@
       - [Testeando sinks que ejecutan JavaScript](#testeando-sinks-que-ejecutan-javascript)
     - [¿Qué sinks pueden generar vulnerabilidades DOM-XSS?](#que-sink-xss)
   - [Contextos](#contextos)
+    - [XSS entre tags HTML](#contextos-xss-tags-html)
+    - [XSS en atributos de tag HTML](#contextos-xss-atributos-tag-html)
+    - [XSS en un JavaScript](#contextos-xss-javascript)
+      - [Terminando el script existente](#contextos-terminando-script-existente)
+      - [Rompiendo el string de JavaScript](#contextos-rompiendo-string-javascript)
+      - [Haciendo uso de la codificación HTML](#contextos-haciendo-uso-codificación-html)
+      - [XSS en templates literales de JavaScript](#contextos-xss-templates-literales-javascript)
+    - [XSS en el contexto del sandbox de AngularJS](#xss-contexto-sandbox-angularjs)
 
 <h2 id="que-xss">¿Qué es un Cross-Site Scripting?</h2>
 
@@ -231,3 +239,128 @@ Cuando se hacen pruebas para reflected XSS y stored XSS, la clave es identificar
 
 - La ubicación dentro de la respuesta donde aparecen los datos enviados por el atacante.
 - Cualquier validación de entrada u otro procesamiento que la aplicación esté realizando en esos datos.
+
+<h4 id="contextos-xss-tags-html">XSS entre tags HTML</h4>
+
+Cuando el XSS se encuentra entre tags HTML, es necesario introducir un nuevo tag diseñado para ejecutar.
+
+Ejemplo de payload:
+
+```
+<script>alert(document.domain)</script>
+<img src=1 onerror=alert(1)>
+```
+
+<h4 id="contextos-xss-atributos-tag-html">XSS en atributos de tag HTML</h4>
+
+Cuando este se encuenta entre atributos del tag HTML, es necesario terminar el valor del atributo.
+
+Ejemplo de payload:
+
+```
+"><script>alert(document.domain)</script>
+```
+
+Es común que los corchetes angulares (`<>`) están bloqueados o codificados, por lo que, no es posible salirse de la etiqueta en la que estamos. Para terminar el valor del atributo, se puede introducir un nuevo atributo que crea un contexto programable.
+
+Ejemplo de payload:
+
+```
+" autofocus onfocus=alert(document.domain) x="
+```
+
+A veces, el contexto XSS está en un tipo de atributo de etiqueta HTML que por sí mismo puede crear un contexto programable. Aquí, se puede ejecutar JavaScript sin necesidad de terminar el valor del atributo. 
+
+Ejemplo de payload:
+
+```
+<a href="javascript:alert(document.domain)">
+```
+
+Es posible encontrar sitios web que codifican corchetes angulares (`<>`), pero aún se permite inyectar atributos. A veces, estas inyecciones son posibles incluso dentro de etiquetas que generalmente no activan eventos automáticamente, como una [etiqueta canónica](https://es.ryte.com/wiki/Etiqueta_Rel%3DCanonical). Se puede aprovechar este comportamiento mediante las claves de acceso y la interacción del usuario en Chrome. Las teclas de acceso permiten proporcionar atajos de teclado que hacen referencia a un elemento específico. El atributo `accesskey` permite definir una letra que, cuando se presiona en combinación con otras teclas (que varían en diferentes plataformas), provocará que se activen eventos.
+
+<h4 id="contextos-xss-javascript">XSS en un JavaScript</h4>
+
+Cuando el contexto XSS es algún JavaScript existente dentro de la respuesta, pueden surgir una amplia variedad de situaciones, con diferentes técnicas necesarias para realizar un exploit exitoso.
+
+<h5 id="contextos-terminando-script-existente">Terminando el script existente</h5>
+
+En el caso más simple, es posible cerrar la etiqueta contiene el JavaScript existente e introducir algunas etiquetas HTML nuevas que activarán la ejecución de JavaScript.
+
+Ejemplo de payload:
+
+```
+</script><img src=1 onerror=alert(document.domain)>
+```
+
+La razón por la que esto funciona es que el navegador primero realiza el análisis de HTML para identificar los elementos de la página, incluidos los bloques de secuencia de comandos, y luego realiza el análisis de JavaScript para comprender y ejecutar las secuencias de comandos incrustadas. El payload anterior deja el script original roto, con una cadena literal sin terminar. Pero eso no impide que la secuencia de comandos posterior se analice y ejecute de la manera normal.
+
+<h5 id="contextos-rompiendo-string-javascript">Rompiendo el string de JavaScript</h5>
+
+En los casos en los que el contexto XSS está dentro de un string literal entre comillas, a menudo es posible salirse de este y ejecutar JavaScript directamente. Es esencial reparar el script siguiendo el contexto XSS, porque cualquier error de sintaxis impedirá que se ejecute todo el script.
+
+Ejemplo de payload:
+
+```
+'-alert(document.domain)-'
+';alert(document.domain)//
+```
+
+Algunas aplicaciones intentan evitar que la entrada se salga del string de JavaScript escapando los caracteres de comillas simples con un backslash. Un backslash antes de un carácter le dice al analizador de JavaScript que el carácter debe interpretarse literalmente y no como un carácter especial, como un terminador de string. En esta situación, las aplicaciones suelen cometer el error de no escapar del carácter del backslash. Esto significa que un atacante puede usar su propio backslash para neutralizar el backslash que agrega la aplicación.
+
+Ejemplo de payload:
+
+```
+\';alert(document.domain)//
+```
+
+El primer backslash significa que el segundo backslash se interpreta literalmente y no como un carácter especial. Esto significa que la comilla ahora se interpreta como un terminador de string, por lo que el ataque tiene éxito.
+
+Algunos sitios web hacen que los XSS sea más difíciles de explotar al restringir los caracteres. Esto puede ser a nivel del sitio web o mediante la implementación de un WAF que evite que los request lleguen al sitio web. En estas situaciones, se debe experimentar con otras formas de llamar a funciones que eluden estas medidas de seguridad. Una forma de hacer esto es usar la instrucción `throw` con un manejador de excepciones. Esto permite pasar argumentos a una función sin usar paréntesis. El siguiente código asigna la función `alert()` al manejador de excepciones global y la declaración `throw` pasa el `1` al manejador de excepciones (en este caso, `alert`). El resultado final es la llamada a la función `alert()` con `1` como argumento.
+
+```
+onerror=alert;throw 1
+```
+
+<h5 id="contextos-haciendo-uso-codificación-html">Haciendo uso de la codificación HTML</h5>
+
+Cuando el contexto XSS es un JavaScript existente dentro de un atributo de etiqueta entre comillas (como un controlador de eventos), es posible hacer uso de la codificación HTML para evitar algunos filtros de entrada.
+
+Cuando el navegador ha analizado las etiquetas HTML y los atributos dentro de una respuesta, realizará la decodificación HTML de los valores de los atributos de las etiquetas antes de que se procesen más. Si la aplicación del lado del servidor bloquea o `sanitiza` ciertos caracteres que son necesarios para un exploit XSS exitoso. A veces, se puede realizar un bypass de la validación de entrada codificando en HTML esos caracteres.
+
+Ejemplo: se tiene el siguiente contexto XSS.
+
+```
+<a href="#" onclick="... var input='controllable data here'; ...">
+```
+
+La aplicación bloquea o escapa las comillas simples, se puede usar el siguiente payload para quebrar el string JavaScript y ejecutar el nuestro:
+
+```
+&apos;-alert(document.domain)-&apos;
+
+```
+
+En este caso, la secuencia `&apos;`es una entidad HTML que representa un apóstrofo o una comilla simple.
+
+<h5 id="contextos-xss-templates-literales-javascript">XSS en templates literales de JavaScript</h5>
+
+Los templates literales de JavaScript son strings literales que permiten expresiones de JavaScript incrustadas. Las expresiones incrustadas se evalúan y normalmente se concatenan en el texto circundante. Los literales de plantilla se encapsulan en backticks (``) en lugar de comillas normales, y las expresiones incrustadas se identifican mediante la sintaxis `${...}`.
+
+Ejemplo de templates literales:
+
+```
+document.getElementById('message').innerText = `Welcome, ${user.displayName}.`;
+```
+
+En este caso no es necesario terminar el template literal, solo se necesita usar la sintaxis incrustada (`${...}`).
+
+Ejemplo de payload:
+
+```
+${alert(document.domain)}
+```
+
+<h4 id="xss-contexto-sandbox-angularjs">XSS en el contexto del sandbox de AngularJS</h4>
+
+A veces, las vulnerabilidades XSS surgen en el contexto de AngularJS sandbox. Esto presenta barreras adicionales para la explotación, que a menudo se pueden sortear con suficiente ingenio.
