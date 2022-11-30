@@ -9,3 +9,8 @@ Encontraras info sobre:
 - [Hacking Sistemas](cheatsheet_sys.md)
 - [Reconocimiento](cheatsheet_recon.md)
 - [Vulnerability Assessment](cheatsheet_vuln.md)
+
+Para mayor información, visitar:
+
+- [W0lf_F4ng](https://www.w0lff4ng.org/)
+- [Gitbook](https://w0lf-f4ng.gitbook.io/)
